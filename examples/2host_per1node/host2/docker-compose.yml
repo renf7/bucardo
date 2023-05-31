@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   rsd-bucardo:
-    image: rsd-bucardo
+    image: renf7/bucardo
     network_mode: host
     ports:
       - 5432:5432

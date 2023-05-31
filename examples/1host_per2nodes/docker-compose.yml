@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   rsd-bucardo1:
-    image: rsd-bucardo
+    image: renf7/bucardo
     network_mode: host
     ports:
       - 5432:5432
@@ -11,7 +11,7 @@ services:
     environment:
       - OPTIONAL_HOSTNAMES=host1,rsd-bucardo1
   rsd-bucardo2:
-    image: rsd-bucardo
+    image: renf7/bucardo
     network_mode: host
     ports:
       - 5433:5432
