@@ -14,7 +14,7 @@ RUN apt-get update \
 COPY install_modules.sh /tmp/install_modules.sh
 
 # Run the installation script
-RUN /tmp/install_modules.sh
+RUN /bin/bash /tmp/install_modules.sh
 
 # Clone bucardo repo
 RUN git clone https://github.com/bucardo/bucardo.git
