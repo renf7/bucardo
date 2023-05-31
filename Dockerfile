@@ -56,5 +56,8 @@ USER root
 # Add metadata to an image
 LABEL maintainer="rafalszymonduda@outlook.com"
 
+# Remove not needed
+CMD apt-get remove build-essential
+
 # Start PostgreSQL
 CMD ["postgres"]

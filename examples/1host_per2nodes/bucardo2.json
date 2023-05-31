@@ -2,17 +2,17 @@
   "databases":[
     {
       "id": "server1",
-      "dbname": "airflow",
+      "dbname": "example",
       "host": "rsd-bucardo1",
-      "user": "airflow",
-      "pass": "airflow"
+      "user": "example",
+      "pass": "example"
     },
     {
       "id": "server2",
-      "dbname": "airflow",
+      "dbname": "example",
       "host": "rsd-bucardo2",
-      "user": "airflow",
-      "pass": "airflow"
+      "user": "example",
+      "pass": "example"
     }
   ],
   "syncs" : [
