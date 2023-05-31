@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  rsd-bucardo:
+    image: rsd-bucardo
+    network_mode: host
+    ports:
+      - 5432:5432
+    volumes:
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+      - ./bucardo1.json:/media/bucardo.json
+    environment:
+      - OPTIONAL_HOSTNAMES=host2,rsd-bucardo

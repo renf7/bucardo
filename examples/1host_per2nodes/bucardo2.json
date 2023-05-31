@@ -1,0 +1,24 @@
+{
+  "databases":[
+    {
+      "id": "server1",
+      "dbname": "airflow",
+      "host": "rsd-bucardo1",
+      "user": "airflow",
+      "pass": "airflow"
+    },
+    {
+      "id": "server2",
+      "dbname": "airflow",
+      "host": "rsd-bucardo2",
+      "user": "airflow",
+      "pass": "airflow"
+    }
+  ],
+  "syncs" : [
+    {
+      "sources": ["server2"],
+      "targets": ["server1"]
+    }
+  ]
+}
