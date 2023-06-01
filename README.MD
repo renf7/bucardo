@@ -152,24 +152,6 @@ Ensure that you are running the command in the same directory where the \`bucard
 
 By following these steps, you will have the container set up with the required environment variables and the \`bucardo.json\` configuration file mounted. This allows Bucardo to access the necessary database configurations and synchronize data effectively.
 
-## Running the Project
-
-1. Build the Docker image using the provided Dockerfile. From the root of the project directory, run:
-
-```bash
-docker build -t bucardo .
-```
-
-2. Start a container using the built image:
-
-```bash
-docker run -d -p 5432:5432 -v "/path/to/your/json:/media/bucardo.json" bucardo
-```
-
-Ensure to replace `"/path/to/your/json"` with the actual path to your Bucardo configuration JSON file.
-
-Check the container logs for any errors or information regarding the state of replication setup.
-
 ## Troubleshooting
 
 In case of issues, here are some steps you might take to diagnose and fix them:
