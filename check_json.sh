@@ -1,5 +1,45 @@
 #!/bin/bash
 set -e
+
+
+# Function to validate database connections
+# This function reads each database configuration from the 'bucardo.json' file,
+# attempts to connect to the database 10 times, and if all attempts fail, it will exit the script with error.
+validate_db_connections() {
+  # Define the JSON file path
+  local json_file="/media/bucardo.json"
+
+  # Check if the JSON file exists
+  if [ -f "$json_file" ]; then
+      # Loop over each database configuration in the JSON file
+      jq -c '.databases[]' "${json_file}" | while read -r db; do
+          # Extract database connection details from the JSON
+          local id=$(echo "${db}" | jq -r '.id')
+          local host=$(echo "${db}" | jq -r '.host')
+          local port=$(echo "${db}" | jq -r '.port')
+
+          # Set default values if any values are null
+          [ "${host}" == "null" ] && host="localhost"
+          [ "${port}" == "null" ] && port="5432"
+
+          # Try to connect to the host:port 10 times
+          for attempt in {1..10}; do
+              nc -zv "${host}" "${port}" >/dev/null 2>&1 && break || sleep 1
+          done
+
+          # If all connection attempts failed, print an error message and exit the script
+          if [ $attempt -eq 10 ]; then
+              echo "Error: Could not connect to ${dbname}@${host}:${port} as user ${user} after 10 attempts. Please review the configuration for database \"${id}\" in bucardo.json."
+              exit 1
+          fi
+      done
+  else
+    # If the JSON file does not exist, print an error message and exit the script
+    echo "Error: The 'bucardo.json' file is mandatory. Please mount it under the path: '/media/bucardo.json'. You can do this using a command like: 'docker run -v \"path_to_your_local_bucardo.json:/media/bucardo.json\" name_of_your_container'."
+    exit 1
+  fi
+}
+
 # Function to initialize database
 init_db_against_bucardo_json() {
     # Convert the comma-separated hostnames and other host information into an array
@@ -149,6 +189,9 @@ if [ -f /tmp/last_modification_time ]; then
 else
   last_modification_time=
 fi
+
+# Stop execution of the script if bucardo.json contains invalid configuration against db connections
+validate_db_connections
 
 # If the modification time has changed, run the JSON reading section
 if [ "$last_modification_time" != "$current_modification_time" ]; then
