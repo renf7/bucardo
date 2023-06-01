@@ -1,4 +1,4 @@
-# Multimaster Posrtgresql cluster
+# Multimaster Postgresql cluster
 
 This project provides a Docker setup for [Bucardo](https://bucardo.org/Bucardo/), a PostgreSQL replication system allowing for multi-source, multi-target replication.
 You may create in easy way cluster depending on bucardo.json configuration
