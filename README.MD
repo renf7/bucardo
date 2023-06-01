@@ -16,20 +16,20 @@ You may create in easy way cluster depending on bucardo.json configuration
 ├── Dockerfile
 ├── install_modules.sh
 └── examples
-├── 1host_per2nodes
-│   ├── bucardo1.json
-│   ├── bucardo2.json
-│   ├── docker-compose.yml
-│   └── init-db.sql
-└── 2host_per1node
-├── host1
-│   ├── bucardo1.json
-│   ├── docker-compose.yml
-│   └── init-db.sql
-└── host2
-├── bucardo1.json
-├── docker-compose.yml
-└── init-db.sql
+  ├── 1host_per2nodes
+  │   ├── bucardo1.json
+  │   ├── bucardo2.json
+  │   ├── docker-compose.yml
+  │   └── init-db.sql
+  └── 2host_per1node
+      ├── host1
+      │   ├── bucardo1.json
+      │   ├── docker-compose.yml
+      │   └── init-db.sql
+      └── host2
+          ├── bucardo1.json
+          ├── docker-compose.yml
+          └── init-db.sql
 ```
 
 ## Scripts and Files
