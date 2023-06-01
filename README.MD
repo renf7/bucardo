@@ -1,6 +1,10 @@
 # Multimaster Postgresql cluster
 
-This project provides a Docker setup for [Bucardo](https://bucardo.org/Bucardo/), a PostgreSQL replication system allowing for multi-source, multi-target replication.
+This project provides master-master Postgresql cluster with scalable amount of nodes. It can be placed on many hosts as well as on one host in with multiple docker containers. All is up to setup.
+
+## Overview
+
+It is a Docker setup for [Bucardo](https://bucardo.org/Bucardo/), a PostgreSQL replication system allowing for multi-source, multi-target replication.
 You may create in easy way cluster depending on bucardo.json configuration
 
 ## Project Structure
@@ -32,7 +36,13 @@ You may create in easy way cluster depending on bucardo.json configuration
 
 - `Dockerfile`: Contains the instructions to build the Docker image for Bucardo.
 - `docker-entrypoint.sh`: The entrypoint script that runs when the Docker container starts up.
-- `check_json.sh`: A script for validating and setting up databases from a JSON configuration file.
+- `check_json.sh`: A script for validating and setting up databases from a JSON configuration file. It is executed every 10 seconds. 
+  - The logic of the script is triggered only if one of the bellow is met:
+    - container just starts up
+    - file `bucardo.json` is changed
+  - The script logic will not be fired if:
+    - there is no `bucardo.json`
+    - all databases contained in `bucardo.json` is able to access
 - `install_modules.sh`: A script for installing the necessary Perl modules.
 - `examples`: Contains two subdirectories `1host_per2nodes` and `2host_per1node`, demonstrating sample configurations for Bucardo.
 
