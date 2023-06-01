@@ -156,7 +156,7 @@ In the \`examples\` directory, you can find examples of how you could use this s
 You can run these examples by navigating into the respective directories and executing the Docker Compose command:
 
 ```bash
-docker-compose up
+docker compose up
 ```
 
 Remember to adjust the Bucardo JSON configuration files and the SQL scripts according to your needs.
