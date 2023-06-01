@@ -52,6 +52,8 @@ The project is automatically built in docker hub. You may find it under:
 
 ## Configuration
 
+### JSON config
+
 The project uses a JSON configuration file (`bucardo.json`) to describe the databases and syncs involved in the replication setup.
 
 Here's an example of the structure of the JSON file:
@@ -89,7 +91,7 @@ Here's an example of the structure of the JSON file:
 }
 ```
 
-### Database Configuration
+#### Database Configuration
 
 The `"databases"` array describes the databases to be used for replication. Each database object should contain:
 
@@ -100,7 +102,7 @@ The `"databases"` array describes the databases to be used for replication. Each
 - `"user"`: The username for authentication.
 - `"pass"`: The password for authentication.
 
-### Sync Configuration
+#### Sync Configuration
 
 The `"syncs"` array describes the syncs for data replication. Each sync object should contain:
 
