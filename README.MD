@@ -7,6 +7,10 @@ This project provides master-master Postgresql cluster with scalable amount of n
 It is a Docker setup for [Bucardo](https://bucardo.org/Bucardo/), a PostgreSQL replication system allowing for multi-source, multi-target replication.
 You may create in easy way cluster depending on bucardo.json configuration
 
+The project is automatically built in docker hub. You may find it under:
+ - Github https://github.com/renf7/bucardo
+ - Docker hub https://hub.docker.com/r/renf7/bucardo
+
 ## Project Structure
 
 ```
@@ -104,6 +108,49 @@ The `"syncs"` array describes the syncs for data replication. Each sync object s
 - `"targets"`: An array of database IDs to which data is replicated.
 
 The project uses these configurations to set up and manage the replication process. Adjust the configuration to match your setup. For a complete list of configuration options, refer to the [Bucardo documentation](https://bucardo.org/Bucardo/configuration_variables/).
+
+### Set up the container
+
+Before running the container, you need to configure: 
+- the environment variable `OPTIONAL_HOSTNAMES` 
+- volume mount of `bucardo.json` configuration file. 
+- optionaly you may use features of `posrgres:15.3` image such us  `/docker-entrypoint-initdb.d` folder to execute database scripts. Note `renf7/bucardo` docker image bases on `postgres:15.3` docker image that inherits all functionalities on top of that. Please check https://hub.docker.com/_/postgres/ for more details
+
+#### Using Docker Compose
+
+In your \`docker-compose.yml\` file, define the environment variables and volumes for the \`bucardo\` service:
+
+```yaml
+services:
+  bucardo:
+    image: bucardo/bucardo:latest
+    environment:
+      - OPTIONAL_HOSTNAMES=pg_container,vm_host
+    volumes:
+      - ./bucardo.json:/media/bucardo.json
+```
+
+Make sure to adjust the \`OPTIONAL_HOSTNAMES\` variable and the volume path according to your setup.
+
+To start the container using Docker Compose, run the following command:
+
+```bash
+docker-compose up -d
+```
+
+#### Using Docker CLI
+
+If you prefer to use the Docker CLI directly, you can run the container with the necessary environment variables and volume mounts:
+
+```bash
+docker run -e OPTIONAL_HOSTNAMES="pg_container,vm_host" -v "$(pwd)/bucardo.json:/media/bucardo.json" bucardo/bucardo:latest
+```
+
+Adjust the \`OPTIONAL_HOSTNAMES\` variable and the volume mount path according to your setup.
+
+Ensure that you are running the command in the same directory where the \`bucardo.json\` file is located.
+
+By following these steps, you will have the container set up with the required environment variables and the \`bucardo.json\` configuration file mounted. This allows Bucardo to access the necessary database configurations and synchronize data effectively.
 
 ## Running the Project
 
