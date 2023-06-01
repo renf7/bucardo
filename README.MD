@@ -1,6 +1,6 @@
 # Multimaster Postgresql cluster
 
-This project provides master-master Postgresql cluster with scalable amount of nodes. It can be placed on many hosts as well as on one host in with multiple docker containers. All is up to setup.
+This project provides master-master Postgresql cluster with scalable amount of nodes. It can be placed on many hosts as well as on one host with multiple docker containers. All is up to setup.
 
 ## Overview
 
