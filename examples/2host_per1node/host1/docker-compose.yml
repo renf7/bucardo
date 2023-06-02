@@ -2,7 +2,6 @@ version: '3.8'
 services:
   rsd-bucardo:
     image: renf7/bucardo
-    network_mode: host
     ports:
       - 5432:5432
     volumes:
@@ -10,3 +9,9 @@ services:
       - ./bucardo1.json:/media/bucardo.json
     environment:
       - OPTIONAL_HOSTNAMES=host1,rsd-bucardo
+    networks:
+      - my_custom_network
+
+networks:
+  my_custom_network:
+    driver: bridge

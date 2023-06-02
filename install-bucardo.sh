@@ -19,14 +19,5 @@ install_bucardo() {
     bucardo install --batch
 }
 
-# Listen bucardo.json file to setup synchronisation between databases
-function listen_bucardo_json() {
-  while true; do sleep 10;/bin/bash /opt/bucardo/check_json.sh;   done &
-}
-
-
 # Call the functions
 install_bucardo
-listen_bucardo_json
-
-

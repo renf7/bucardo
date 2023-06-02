@@ -15,10 +15,11 @@ The project is automatically built in docker hub. You may find it under:
 
 ```
 .
-├── check_json.sh
-├── docker-entrypoint.sh
+├── apply-bucardo-config.sh
+├── docker-start-up.sh
 ├── Dockerfile
-├── install_modules.sh
+├── install-bucardo.dh
+├── install-modules.sh
 └── examples
   ├── 1host_per2nodes
   │   ├── bucardo1.json
@@ -39,15 +40,16 @@ The project is automatically built in docker hub. You may find it under:
 ## Scripts and Files
 
 - `Dockerfile`: Contains the instructions to build the Docker image for Bucardo.
-- `docker-entrypoint.sh`: The entrypoint script that runs when the Docker container starts up.
-- `check_json.sh`: A script for validating and setting up databases from a JSON configuration file. It is executed every 10 seconds. 
+- `install-bucardo.dh`: The entrypoint script that runs when the Docker container starts up.
+- `apply-bucardo-config.sh`: A script for validating and setting up databases from a JSON configuration file. It is executed every 10 seconds. 
   - The logic of the script is triggered only if one of the bellow is met:
     - container just starts up
     - file `bucardo.json` is changed
   - The script logic will not be fired if:
     - there is no `bucardo.json`
     - all databases contained in `bucardo.json` is able to access
-- `install_modules.sh`: A script for installing the necessary Perl modules.
+- `install-modules.sh`: A script for installing the necessary Perl modules.
+- `docker-start-up.sh`: Overrides regular postgres docker startup script to put in addition apply-bucardo-config.sh running every 10 seconds 
 - `examples`: Contains two subdirectories `1host_per2nodes` and `2host_per1node`, demonstrating sample configurations for Bucardo.
 
 ## Configuration

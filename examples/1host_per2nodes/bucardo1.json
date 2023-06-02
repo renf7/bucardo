@@ -3,14 +3,14 @@
     {
       "id": "server1",
       "dbname": "example",
-      "host": "host1",
+      "host": "rsd-bucardo1",
       "user": "example",
       "pass": "example"
     },
     {
       "id": "server2",
       "dbname": "example",
-      "host": "host2",
+      "host": "rsd-bucardo2",
       "user": "example",
       "pass": "example"
     }

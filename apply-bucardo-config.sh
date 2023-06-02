@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 
 # Function to validate database connections
@@ -29,13 +28,13 @@ validate_db_connections() {
 
           # If all connection attempts failed, print an error message and exit the script
           if [ $attempt -eq 10 ]; then
-              echo "Error: Could not connect to ${dbname}@${host}:${port} as user ${user} after 10 attempts. Please review the configuration for database \"${id}\" in bucardo.json."
+              echo "[apply-bucardo-config.sh] Error: Could not connect to ${dbname}@${host}:${port} as user ${user} after 10 attempts. Please review the configuration for database \"${id}\" in bucardo.json."
               exit 1
           fi
       done
   else
     # If the JSON file does not exist, print an error message and exit the script
-    echo "Error: The 'bucardo.json' file is mandatory. Please mount it under the path: '/media/bucardo.json'. You can do this using a command like: 'docker run -v \"path_to_your_local_bucardo.json:/media/bucardo.json\" name_of_your_container'."
+    echo "[apply-bucardo-config.sh] Error: The 'bucardo.json' file is mandatory. Please mount it under the path: '/media/bucardo.json'. You can do this using a command like: 'docker run -v \"path_to_your_local_bucardo.json:/media/bucardo.json\" name_of_your_container'."
     exit 1
   fi
 }
@@ -84,10 +83,34 @@ init_db_against_bucardo_json() {
     fi
 }
 
+# Remove all Bucardo object what can be added by this script
+removeAllBucardoObjects() {
+  echo "[apply-bucardo-config.sh] Remove all bucardo objects"
+
+  # Stop and remove all syncs
+  for sync in $(bucardo list sync | awk '{print $1}'); do
+      bucardo stop sync $sync
+      bucardo remove sync $sync
+  done
+
+  # Remove all relation groups
+  for relgroup in $(bucardo list relgroup | awk '{print $1}'); do
+      bucardo remove relgroup $relgroup
+  done
+
+  # Remove all databases
+  for db in $(bucardo list db | awk '{print $1}'); do
+      bucardo remove db $db
+  done
+}
+
 # The JSON reading section
 json_reading_section() {
   json_file="/media/bucardo.json"
   if [ -f "$json_file" ]; then
+
+      # Remove all bucardo objects what might be added in previous script invocation apply-bucardo-config.sh
+      removeAllBucardoObjects;
 
       # Read databases from the JSON file and add each to Bucardo
       jq -c '.databases[]' "${json_file}" | while read -r db; do
@@ -112,10 +135,10 @@ json_reading_section() {
 
           if [ $attempt -lt 10 ]; then
               args=( "dbname=${dbname}" "host=${host}" "user=${user}" "pass=${pass}" "port=${port}" )
-              echo bucardo add db "${id}" "${args[@]}"
+              echo "[apply-bucardo-config.sh] bucardo add db \"${id}\" \"${args[@]}\""
               bucardo add db "${id}" "${args[@]}"
           else
-              echo "Warning: Cannot connect to ${host}:${port} after 10 attempts. Skipping database ${id}."
+              echo "[apply-bucardo-config.sh] Warning: Cannot connect to ${host}:${port} after 10 attempts. Skipping database ${id}."
           fi
       done
 
@@ -133,10 +156,10 @@ json_reading_section() {
           for server in $servers; do
               # Check if database was added before trying to add tables or sync
               if bucardo list db "${server}" | grep -q "Status: active"; then
-                echo bucardo add all tables --herd=relGroup$i$server db=$server
+                  echo "[apply-bucardo-config.sh] bucardo add all tables --herd=relGroup$i$server db=$server"
                   bucardo add all tables --herd=relGroup$i$server db=$server
               else
-                  echo "Warning: Database ${server} was not added. Skipping adding tables and sync."
+                  echo "[apply-bucardo-config.sh] Warning: Database ${server} was not added. Skipping adding tables and sync."
               fi
           done
 
@@ -144,10 +167,10 @@ json_reading_section() {
           for source in $sources; do
               # Check if database was added before trying to add sync
               if bucardo list db "${source}" | grep -q "Status: active"; then
-                echo bucardo add sync sync$i$source relgroup=relGroup$i$source dbs="$source,$targets"
+                  echo "[apply-bucardo-config.sh] bucardo add sync sync$i$source relgroup=relGroup$i$source dbs=\"$source,$targets\""
                   bucardo add sync sync$i$source relgroup=relGroup$i$source dbs="$source,$targets"
               else
-                  echo "Warning: Database ${source} was not added. Skipping adding sync."
+                  echo "[apply-bucardo-config.sh] Warning: Database ${source} was not added. Skipping adding sync."
               fi
           done
 
@@ -156,46 +179,50 @@ json_reading_section() {
       done
 
       # List all syncs
-      echo "Bucardo syncs:"
+      echo "[apply-bucardo-config.sh] Bucardo syncs:"
       bucardo list sync
 
       # Restart all syncs
-      echo "Restarting all Bucardo syncs:"
+      echo "[apply-bucardo-config.sh] Restarting all Bucardo syncs:"
       bucardo restart sync
 
       # Show Bucardo status
-      echo "Bucardo status:"
+      echo "[apply-bucardo-config.sh] Bucardo status:"
       bucardo status
 
   fi
 }
 
-# File to store the last modification time
-last_modification_file="/tmp/last_modification_time"
+function listen_bucardo_json() {
+  # File to store the last modification time
+  last_modification_file="/tmp/last_modification_time"
 
-# Check if the json file exists
-json_file="/media/bucardo.json"
-if [ ! -f "$json_file" ]; then
-    echo "JSON file does not exist: $json_file"
-    exit 0
-fi
+  # Check if the json file exists
+  json_file="/media/bucardo.json"
+  if [ ! -f "$json_file" ]; then
+      echo "[apply-bucardo-config.sh] JSON file does not exist: $json_file"
+      exit 0
+  fi
 
-# Get the current modification time
-current_modification_time=$(stat -c %Y "$json_file")
+  # Get the current modification time
+  current_modification_time=$(stat -c %Y "$json_file")
 
-# Get the last modification time
-if [ -f /tmp/last_modification_time ]; then
-  last_modification_time=$(cat $last_modification_file)
-else
-  last_modification_time=
-fi
+  # Get the last modification time
+  if [ -f /tmp/last_modification_time ]; then
+    last_modification_time=$(cat $last_modification_file)
+  else
+    last_modification_time=
+  fi
 
-# Stop execution of the script if bucardo.json contains invalid configuration against db connections
-validate_db_connections
+  # Stop execution of the script if bucardo.json contains invalid configuration against db connections
+  validate_db_connections
 
-# If the modification time has changed, run the JSON reading section
-if [ "$last_modification_time" != "$current_modification_time" ]; then
-    echo $current_modification_time > $last_modification_file
-    init_db_against_bucardo_json
-    json_reading_section
-fi
+  # If the modification time has changed, run the JSON reading section
+  if [ "$last_modification_time" != "$current_modification_time" ]; then
+      echo $current_modification_time > $last_modification_file
+      init_db_against_bucardo_json
+      json_reading_section
+  fi
+}
+
+while true; do sleep 10;listen_bucardo_json;   done

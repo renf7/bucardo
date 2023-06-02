@@ -11,10 +11,10 @@ RUN apt-get update \
     && apt-get install -y perl make postgresql-plperl-15 libdbix-safe-perl libboolean-perl libjson-perl git cpanminus libpq-dev build-essential jq curl net-tools netcat iputils-ping vim
 
 # Copy the installation script
-COPY install_modules.sh /tmp/install_modules.sh
+COPY install-modules.sh /tmp/install-modules.sh
 
 # Run the installation script
-RUN /bin/bash /tmp/install_modules.sh
+RUN /bin/bash /tmp/install-modules.sh
 
 # Clone bucardo repo
 RUN git clone https://github.com/bucardo/bucardo.git
@@ -38,26 +38,29 @@ RUN mkdir -p /media && chown -R postgres:postgres /media
 # Expose Postgres port
 EXPOSE 5432
 
-RUN mkdir -p /opt/bucardo
-COPY check_json.sh /opt/bucardo/
-
 # Switch to the postgres user
 USER postgres
 
 # create file owned by postgres to allow execution 'bucardo restart sync' as postgres user
 RUN touch bucardo.restart.reason.txt
 
-# Copy the entrypoint script
-COPY docker-entrypoint.sh /docker-entrypoint-initdb.d/
+# Copy the bucardo install script
+COPY  install-bucardo.sh /docker-entrypoint-initdb.d/
 
-# Switch back to root user
-USER root
+# Copy bucardo.json script
+COPY apply-bucardo-config.sh /usr/local/bin/
+
+COPY docker-start-up.sh /usr/local/bin/
 
 # Add metadata to an image
 LABEL maintainer="rafalszymonduda@outlook.com"
 
 # Remove not needed
-CMD apt-get remove build-essential
+CMD apt-get remove build-essential libpq-dev && \
+    apt-get autoremove -yqq -purge && \
+    apt-get clean
 
-# Start PostgreSQL
-CMD ["postgres"]
+# Override PostgreSQL entrypoint
+ENTRYPOINT ["/bin/bash"]
+
+CMD ["docker-start-up.sh"]

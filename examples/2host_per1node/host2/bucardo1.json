@@ -17,8 +17,8 @@
   ],
   "syncs" : [
     {
-      "sources": ["server1"],
-      "targets": ["server2"]
+      "sources": ["server2"],
+      "targets": ["server1"]
     }
   ]
 }
