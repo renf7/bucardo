@@ -44,14 +44,6 @@ init_db_against_bucardo_json() {
     # Convert the comma-separated hostnames and other host information into an array
     IFS=',' read -r -a temp <<< "$(hostname),$(hostname -i),$(getent hosts host.docker.internal | awk '{print $2}'),$(getent hosts host.docker.internal | awk '{print $1}'),${OPTIONAL_HOSTNAMES}"
 
-    # Declare an associative array available from Bash version 4
-    declare -A all_hostnames
-
-    # Populate the associative array with the hostnames
-    for i in "${temp[@]}"; do
-        all_hostnames["$i"]=1
-    done
-
     # Initialize JSON file
     json_file="/media/bucardo.json"
 
@@ -64,8 +56,8 @@ init_db_against_bucardo_json() {
             user=$(echo "${db}" | jq -r '.user')
             pass=$(echo "${db}" | jq -r '.pass')
 
-            # Check if $host is in the array of all_hostnames
-            if [[ ${all_hostnames["$host"]} ]]; then
+            # Check if $host is in the list of available hostnames
+            if [[ " ${temp[*]} " == *" $host "* ]]; then
                 if [[ "$(psql -U postgres -tAc "SELECT 1 FROM pg_roles WHERE rolname='${user}'")" != "1" ]]; then
                     echo psql -U postgres -c "CREATE USER ${user} WITH PASSWORD '${pass}';"
                     psql -U postgres -c "CREATE USER ${user} WITH PASSWORD '${pass}';"
